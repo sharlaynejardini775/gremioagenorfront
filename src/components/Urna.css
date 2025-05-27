@@ -1,0 +1,122 @@
+/* styles/urna.css */
+
+.urna-container {
+  background-color: #dcdcdc;
+  border: 5px solid #bbb;
+  border-radius: 8px;
+  max-width: 720px;
+  padding: 20px;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
+  font-family: 'Arial', sans-serif;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.urna-display {
+  background-color: #ffffff;
+  flex: 3;
+  margin-right: 20px;
+  border: 3px solid #999;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.urna-display h2 {
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  color: #222;
+  text-align: center;
+}
+
+.numero-digito {
+  font-size: 2.4rem;
+  letter-spacing: 0.4rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 12px 0;
+}
+
+.info-equipe {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.info-equipe img {
+  max-width: 180px;
+  max-height: 180px;
+  border-radius: 6px;
+  border: 2px solid #aaa;
+  margin-bottom: 10px;
+}
+
+.teclado-container {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.teclado-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.tecla {
+  height: 60px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.tecla.numero {
+  background-color: #555;
+  color: white;
+}
+
+.tecla.branco {
+  background-color: #eee;
+  color: #000;
+}
+
+.tecla.corrige {
+  background-color: #f0ad4e;
+  color: white;
+}
+
+.tecla.confirma {
+  background-color: #5cb85c;
+  color: white;
+  grid-column: span 3;
+  height: 50px;
+  margin-top: 6px;
+}
+
+.selecao {
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.mensagem {
+  margin-top: 16px;
+  font-size: 1rem;
+  color: #333;
+  font-weight: bold;
+  text-align: center;
+}
+
+.confirmado {
+  color: green;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+}

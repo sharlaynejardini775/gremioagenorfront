@@ -1,0 +1,169 @@
+// Tela.jsx
+import React, { useState, useEffect } from 'react';
+import InfoEquipe from './InfoEquipe';
+import Teclado from './Teclado';
+import api from '../services/api';
+import './urna.css';
+
+const Tela = () => {
+  const [anos, setAnos] = useState([]);
+  const [alunos, setAlunos] = useState([]);
+  const [anoSelecionado, setAnoSelecionado] = useState('');
+  const [alunoSelecionado, setAlunoSelecionado] = useState(null);
+  const [input, setInput] = useState('');
+  const [chapas, setChapas] = useState([]);
+  const [equipe, setEquipe] = useState(null);
+  const [branco, setBranco] = useState(false);
+  const [nulo, setNulo] = useState(false);
+  const [confirmado, setConfirmado] = useState(false);
+  const [mensagem, setMensagem] = useState('');
+
+  useEffect(() => {
+    const fetchAlunos = async () => {
+      try {
+        const res = await api.get('/alunos');
+        setAnos([...new Set(res.data.map((a) => a.ano))]);
+      } catch (err) {
+        console.error('Erro ao buscar anos:', err);
+      }
+    };
+
+    const fetchChapas = async () => {
+      try {
+        const res = await api.get('/chapas');
+        setChapas(res.data);
+      } catch (err) {
+        console.error('Erro ao buscar chapas:', err);
+      }
+    };
+
+    fetchAlunos();
+    fetchChapas();
+  }, []);
+
+  useEffect(() => {
+    if (input.length === 1 || input.length === 2) {
+      const encontrada = chapas.find((c) => String(c.numero) === input);
+      setEquipe(encontrada || null);
+      setNulo(!encontrada);
+    } else {
+      setEquipe(null);
+      setNulo(false);
+    }
+  }, [input, chapas]);
+
+  const handleAnoChange = async (e) => {
+    const ano = e.target.value;
+    setAnoSelecionado(ano);
+    setAlunoSelecionado(null);
+    setInput('');
+    setBranco(false);
+    setNulo(false);
+    setEquipe(null);
+    try {
+      const res = await api.get(`/alunos/ano/${ano}`);
+      setAlunos(res.data);
+    } catch (err) {
+      console.error('Erro ao buscar alunos:', err);
+    }
+  };
+
+  const handleAlunoChange = (e) => {
+    const id = parseInt(e.target.value);
+    const aluno = alunos.find((a) => a.id === id);
+    if (aluno?.jaVotou) {
+      setMensagem('Este aluno já votou!');
+      setAlunoSelecionado(null);
+    } else {
+      setMensagem('');
+      setAlunoSelecionado(aluno);
+    }
+  };
+
+  const handleNumero = (num) => {
+    if (confirmado || !alunoSelecionado) return;
+    if (input.length < 2) setInput((prev) => prev + num);
+  };
+
+  const handleBranco = () => {
+    if (confirmado || !alunoSelecionado) return;
+    setInput('');
+    setBranco(true);
+    setNulo(false);
+    setEquipe(null);
+  };
+
+  const handleCorrige = () => {
+    if (confirmado) return;
+    setInput('');
+    setBranco(false);
+    setNulo(false);
+    setEquipe(null);
+    setMensagem('');
+  };
+
+  const handleConfirma = async () => {
+    if (confirmado || !alunoSelecionado) return;
+    if (input.length >= 1 || branco) {
+      const numeroChapa = branco ? 0 : parseInt(input);
+
+      try {
+        await api.post(`/alunos/${alunoSelecionado.id}/votar`, { numeroChapa });
+        setConfirmado(true);
+        setMensagem('Voto registrado com sucesso!');
+      } catch (err) {
+        console.error('Erro ao votar:', err);
+        setMensagem(err.response?.data?.erro || 'Erro ao registrar voto');
+      }
+    }
+  };
+
+  return (
+    <div className="urna-container">
+      <div className="urna-box">
+        <div className="urna-tela">
+          <h2 className="titulo">JUSTIÇA ELEITORAL</h2>
+
+          {!confirmado && (
+            <>
+              <select className="select" value={anoSelecionado} onChange={handleAnoChange}>
+                <option value="">Selecione o Ano</option>
+                {anos.map((ano) => (
+                  <option key={ano} value={ano}>{ano}</option>
+                ))}
+              </select>
+
+              {anoSelecionado && (
+                <select className="select" value={alunoSelecionado?.id || ''} onChange={handleAlunoChange}>
+                  <option value="">Selecione o Aluno</option>
+                  {alunos.map((a) => (
+                    <option key={a.id} value={a.id}>{a.nome}</option>
+                  ))}
+                </select>
+              )}
+            </>
+          )}
+
+          {alunoSelecionado && !confirmado && (
+            <>
+              <div className="numero-display">{input.padEnd(2, '_')}</div>
+              <InfoEquipe equipe={equipe} branco={branco} nulo={nulo} />
+            </>
+          )}
+
+          {mensagem && <div className="mensagem">{mensagem}</div>}
+          {confirmado && <div className="mensagem sucesso">VOTO CONFIRMADO</div>}
+        </div>
+
+        <Teclado
+          onNumero={handleNumero}
+          onBranco={handleBranco}
+          onCorrige={handleCorrige}
+          onConfirma={handleConfirma}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default Tela;
