@@ -3,7 +3,7 @@ import Tela from '../components/Tela'; // ajuste o caminho conforme a localizaç
 
 const Urna = () => {
 return (
-<div className="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+<div>
 <Tela />
 </div>
 );

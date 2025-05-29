@@ -133,7 +133,7 @@ const Tela = () => {
     <div className="urna-container">
       <div className="urna-box">
         <div className="urna-tela">
-          <h2 className="titulo">JUSTIÇA ELEITORAL - Grêmio Agenor</h2>
+          <h2 className="titulo">VOTAÇÃO GRÊMIO - 2025</h2>
 
           {!confirmado && (
             <div className="urna-selecao">
@@ -157,7 +157,7 @@ const Tela = () => {
 
           {alunoSelecionado && !confirmado && (
             <>
-              <div className="numero-display">{input.padEnd(2, '_')}</div>
+              <div className="numero-display">{input.padEnd(1, '_')}</div>
 
               <div className="urna-corpo">
                 <div className="info-lado">

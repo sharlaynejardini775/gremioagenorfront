@@ -2,6 +2,7 @@ import React from 'react';
 import './InfoEquipe.css';
 
 const InfoEquipe = ({ equipe, branco, nulo }) => {
+  // Se for voto branco/nulo ou nenhuma equipe selecionada
   if (branco) {
     return (
       <div className="info-card branco">
@@ -19,11 +20,16 @@ const InfoEquipe = ({ equipe, branco, nulo }) => {
     );
   }
 
-  if (!equipe) return (
-    <div className="info-card placeholder">
-      <p className="info-placeholder-text">Digite o número da chapa</p>
-    </div>
-  );
+  if (!equipe) {
+    return (
+      <div className="info-card placeholder">
+        <p className="info-placeholder-text">Digite o número da chapa</p>
+      </div>
+    );
+  }
+
+  // Gera o caminho da imagem baseado no número da chapa (PNG)
+  const imagemPath = `/imagens/chapa-${equipe.numero}.png`;
 
   return (
     <div className="info-card chapa">
@@ -33,19 +39,16 @@ const InfoEquipe = ({ equipe, branco, nulo }) => {
       <p className="info-label">Número</p>
       <p className="info-numero">{equipe.numero}</p>
 
-      {equipe.imagemUrl && (
-        <div className="info-imagem-wrapper">
-          <img
-            src={equipe.imagemUrl}
-            alt={`Foto da chapa ${equipe.nome}`}
-            className="info-imagem"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = 'https://via.placeholder.com/180x180?text=Imagem+Indisponível';
-            }}
-          />
-        </div>
-      )}
+      <div className="info-imagem-wrapper">
+        <img
+          src={imagemPath}
+          alt={`Logo da chapa ${equipe.nome}`}
+          onError={(e) => {
+            // Fallback se a imagem não existir
+            e.target.src = '/imagens/default.png';
+          }}
+        />
+      </div>
     </div>
   );
 };
