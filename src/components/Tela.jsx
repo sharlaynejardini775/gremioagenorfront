@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import InfoEquipe from './InfoEquipe';
 import Teclado from './Teclado';
 import api from '../services/api';
-import './urna.css';
-
+import './Urna.css';
+/*teste*/
 const Tela = () => {
   const [anos, setAnos] = useState([]);
   const [alunos, setAlunos] = useState([]);
