@@ -11,8 +11,7 @@ return (
 {/* Página principal de votação */}
 <Route path="/" element={<Urna />} />
 
-php-template
-Copiar código
+
     {/* Página de resultados (gráfico dos ganhadores) */}
     <Route path="/resultados" element={<Resultados />} />
 

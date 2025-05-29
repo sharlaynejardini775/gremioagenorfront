@@ -1,0 +1,77 @@
+/* InfoEquipe.css */
+
+.info-card {
+  text-align: center;
+  border: 2px solid #007bff;
+  border-radius: 8px;
+  padding: 1rem;
+  background-color: #ffffff;
+  min-height: 300px;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-card.branco {
+  border-color: #999;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+.info-card.nulo {
+  border-color: #dc3545;
+  background-color: #ffe6e6;
+  color: #c0392b;
+}
+
+.info-card.placeholder {
+  border: 2px dashed #ccc;
+  background-color: #f5f5f5;
+  color: #999;
+}
+
+.info-placeholder-text {
+  font-style: italic;
+  font-size: 1rem;
+}
+
+.info-label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 0.25rem;
+}
+
+.info-titulo {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 0.5rem;
+}
+
+.info-subtitulo {
+  font-size: 1rem;
+  font-style: italic;
+  color: #666;
+}
+
+.info-numero {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 0.75rem;
+}
+
+.info-imagem-wrapper {
+  margin-top: 1rem;
+}
+
+.info-imagem {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #ccc;
+}

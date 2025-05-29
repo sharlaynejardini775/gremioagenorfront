@@ -1,10 +1,9 @@
-// Tela.jsx
 import React, { useState, useEffect } from 'react';
 import InfoEquipe from './InfoEquipe';
 import Teclado from './Teclado';
 import api from '../services/api';
 import './Urna.css';
-/*teste*/
+
 const Tela = () => {
   const [anos, setAnos] = useState([]);
   const [alunos, setAlunos] = useState([]);
@@ -60,6 +59,7 @@ const Tela = () => {
     setBranco(false);
     setNulo(false);
     setEquipe(null);
+    setMensagem('');
     try {
       const res = await api.get(`/alunos/ano/${ano}`);
       setAlunos(res.data);
@@ -109,8 +109,8 @@ const Tela = () => {
 
       try {
         await api.post(`/alunos/${alunoSelecionado.id}/votar`, { numeroChapa });
-        setConfirmado(true);
-        setMensagem('Voto registrado com sucesso!');
+        alert('Voto registrado com sucesso!');
+        resetarEstado();
       } catch (err) {
         console.error('Erro ao votar:', err);
         setMensagem(err.response?.data?.erro || 'Erro ao registrar voto');
@@ -118,14 +118,25 @@ const Tela = () => {
     }
   };
 
+  const resetarEstado = () => {
+    setAnoSelecionado('');
+    setAlunoSelecionado(null);
+    setInput('');
+    setEquipe(null);
+    setBranco(false);
+    setNulo(false);
+    setConfirmado(false);
+    setMensagem('');
+  };
+
   return (
     <div className="urna-container">
       <div className="urna-box">
         <div className="urna-tela">
-          <h2 className="titulo">JUSTIÇA ELEITORAL</h2>
+          <h2 className="titulo">JUSTIÇA ELEITORAL - Grêmio Agenor</h2>
 
           {!confirmado && (
-            <>
+            <div className="urna-selecao">
               <select className="select" value={anoSelecionado} onChange={handleAnoChange}>
                 <option value="">Selecione o Ano</option>
                 {anos.map((ano) => (
@@ -141,26 +152,32 @@ const Tela = () => {
                   ))}
                 </select>
               )}
-            </>
+            </div>
           )}
 
           {alunoSelecionado && !confirmado && (
             <>
               <div className="numero-display">{input.padEnd(2, '_')}</div>
-              <InfoEquipe equipe={equipe} branco={branco} nulo={nulo} />
+
+              <div className="urna-corpo">
+                <div className="info-lado">
+                  <InfoEquipe equipe={equipe} branco={branco} nulo={nulo} />
+                </div>
+
+                <div className="teclado-lado">
+                  <Teclado
+                    onNumero={handleNumero}
+                    onBranco={handleBranco}
+                    onCorrige={handleCorrige}
+                    onConfirma={handleConfirma}
+                  />
+                </div>
+              </div>
             </>
           )}
 
           {mensagem && <div className="mensagem">{mensagem}</div>}
-          {confirmado && <div className="mensagem sucesso">VOTO CONFIRMADO</div>}
         </div>
-
-        <Teclado
-          onNumero={handleNumero}
-          onBranco={handleBranco}
-          onCorrige={handleCorrige}
-          onConfirma={handleConfirma}
-        />
       </div>
     </div>
   );
