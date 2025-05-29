@@ -2,25 +2,35 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 16px;
+  padding: 10px;
 }
 
 .teclado-grid {
   display: grid;
-  grid-template-columns: repeat(3, 70px);
-  gap: 10px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 15px;
 }
 
 .tecla {
-  height: 60px;
-  font-size: 1.4rem;
+  height: 50px;
+  font-size: 1.2rem;
   font-weight: bold;
   border-radius: 6px;
   border: none;
   cursor: pointer;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.2s ease;
+  box-shadow: 1px 2px 3px rgba(0,0,0,0.3);
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tecla:active {
+  transform: translateY(2px);
+  box-shadow: none;
 }
 
 .tecla.numero {
@@ -29,25 +39,49 @@
 }
 
 .tecla.branco {
-  background-color: #e0e0e0;
+  background-color: #fff;
   color: #000;
-  width: 100px;
-  margin-right: 8px;
-  cursor: not-allowed;
-  opacity: 0.6;
-  margin-bottom: 10px;
+  border: 2px solid #333;
 }
 
 .tecla.corrige {
   background-color: #f0ad4e;
   color: white;
-  width: 100px;
-  margin-right: 8px;
 }
 
 .tecla.confirma {
   background-color: #5cb85c;
   color: white;
-  width: 110px;
-  padding: 5px;
+}
+
+.teclado-funcionais {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .teclado-grid {
+    grid-template-columns: repeat(3, 70px);
+    gap: 10px;
+  }
+  
+  .tecla {
+    height: 60px;
+    font-size: 1.4rem;
+  }
+  
+  .teclado-funcionais {
+    gap: 10px;
+  }
+  
+  .tecla.branco, 
+  .tecla.corrige {
+    width: 100px;
+  }
+  
+  .tecla.confirma {
+    width: 120px;
+  }
 }

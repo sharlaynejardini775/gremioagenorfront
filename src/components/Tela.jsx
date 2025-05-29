@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import InfoEquipe from './InfoEquipe';
 import Teclado from './Teclado';
 import api from '../services/api';
@@ -16,6 +16,16 @@ const Tela = () => {
   const [nulo, setNulo] = useState(false);
   const [confirmado, setConfirmado] = useState(false);
   const [mensagem, setMensagem] = useState('');
+
+  // Refs para os elementos de áudio
+  const audioConfirmacao = useRef(new Audio('/audio/confirma-urna.mp3'));
+  const audioErro = useRef(new Audio('/audio/erro.mp3'));
+
+  // Configura volume máximo ao montar o componente
+  useEffect(() => {
+    audioConfirmacao.current.volume = 1;
+    audioErro.current.volume = 1;
+  }, []);
 
   useEffect(() => {
     const fetchAlunos = async () => {
@@ -50,6 +60,13 @@ const Tela = () => {
       setNulo(false);
     }
   }, [input, chapas]);
+
+  // Toca erro quando voto é nulo
+  useEffect(() => {
+    if (nulo) {
+      audioErro.current.play();
+    }
+  }, [nulo]);
 
   const handleAnoChange = async (e) => {
     const ano = e.target.value;
@@ -109,10 +126,12 @@ const Tela = () => {
 
       try {
         await api.post(`/alunos/${alunoSelecionado.id}/votar`, { numeroChapa });
+        audioConfirmacao.current.play();
         alert('Voto registrado com sucesso!');
         resetarEstado();
       } catch (err) {
         console.error('Erro ao votar:', err);
+        audioErro.current.play();
         setMensagem(err.response?.data?.erro || 'Erro ao registrar voto');
       }
     }
@@ -137,7 +156,11 @@ const Tela = () => {
 
           {!confirmado && (
             <div className="urna-selecao">
-              <select className="select" value={anoSelecionado} onChange={handleAnoChange}>
+              <select 
+                className="select" 
+                value={anoSelecionado} 
+                onChange={handleAnoChange}
+              >
                 <option value="">Selecione o Ano</option>
                 {anos.map((ano) => (
                   <option key={ano} value={ano}>{ano}</option>
@@ -145,7 +168,11 @@ const Tela = () => {
               </select>
 
               {anoSelecionado && (
-                <select className="select" value={alunoSelecionado?.id || ''} onChange={handleAlunoChange}>
+                <select 
+                  className="select" 
+                  value={alunoSelecionado?.id || ''} 
+                  onChange={handleAlunoChange}
+                >
                   <option value="">Selecione o Aluno</option>
                   {alunos.map((a) => (
                     <option key={a.id} value={a.id}>{a.nome}</option>
