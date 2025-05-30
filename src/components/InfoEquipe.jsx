@@ -2,53 +2,47 @@ import React from 'react';
 import './InfoEquipe.css';
 
 const InfoEquipe = ({ equipe, branco, nulo }) => {
-  // Se for voto branco/nulo ou nenhuma equipe selecionada
   if (branco) {
     return (
-      <div className="info-card branco">
-        <p className="info-titulo">VOTO EM BRANCO</p>
+      <div className="info-equipe branco">
+        <div className="info-icon">✉️</div>
+        <div className="info-titulo">VOTO EM BRANCO</div>
       </div>
     );
   }
 
   if (nulo) {
     return (
-      <div className="info-card nulo">
-        <p className="info-titulo">VOTO NULO</p>
-        <span className="info-subtitulo">Número inválido</span>
+      <div className="info-equipe nulo">
+        <div className="info-icon">❌</div>
+        <div className="info-titulo">VOTO NULO</div>
       </div>
     );
   }
 
-  if (!equipe) {
+  if (equipe) {
     return (
-      <div className="info-card placeholder">
-        <p className="info-placeholder-text">Digite o número da chapa</p>
+      <div className="info-equipe valido">
+        <div className="info-numero-chapa">{equipe.numero}</div>
+        <div className="info-nome-chapa">{equipe.nome}</div>
+        <div className="info-imagem-container">
+          <img 
+            src={`/imagens/chapa-${equipe.numero}.png`} 
+            alt={`Chapa ${equipe.nome}`}
+            onError={(e) => {
+              e.target.src = '/imagens/default.png';
+              e.target.className = 'default-image';
+            }}
+          />
+        </div>
       </div>
     );
   }
-
-  // Gera o caminho da imagem baseado no número da chapa (PNG)
-  const imagemPath = `/imagens/chapa-${equipe.numero}.png`;
 
   return (
-    <div className="info-card chapa">
-      <p className="info-label">Nome da Chapa</p>
-      <p className="info-titulo">{equipe.nome}</p>
-
-      <p className="info-label">Número</p>
-      <p className="info-numero">{equipe.numero}</p>
-
-      <div className="info-imagem-wrapper">
-        <img
-          src={imagemPath}
-          alt={`Logo da chapa ${equipe.nome}`}
-          onError={(e) => {
-            // Fallback se a imagem não existir
-            e.target.src = '/imagens/default.png';
-          }}
-        />
-      </div>
+    <div className="info-equipe vazio">
+      <div className="info-icon">⌨️</div>
+      <div className="info-titulo">AGUARDANDO DIGITAÇÃO</div>
     </div>
   );
 };

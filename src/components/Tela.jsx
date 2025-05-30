@@ -17,11 +17,9 @@ const Tela = () => {
   const [confirmado, setConfirmado] = useState(false);
   const [mensagem, setMensagem] = useState('');
 
-  // Refs para os elementos de áudio
   const audioConfirmacao = useRef(new Audio('/audio/confirma-urna.mp3'));
   const audioErro = useRef(new Audio('/audio/erro.mp3'));
 
-  // Configura volume máximo ao montar o componente
   useEffect(() => {
     audioConfirmacao.current.volume = 1;
     audioErro.current.volume = 1;
@@ -51,7 +49,7 @@ const Tela = () => {
   }, []);
 
   useEffect(() => {
-    if (input.length === 1 || input.length === 2) {
+    if (input.length === 1) {
       const encontrada = chapas.find((c) => String(c.numero) === input);
       setEquipe(encontrada || null);
       setNulo(!encontrada);
@@ -61,7 +59,6 @@ const Tela = () => {
     }
   }, [input, chapas]);
 
-  // Toca erro quando voto é nulo
   useEffect(() => {
     if (nulo) {
       audioErro.current.play();
@@ -99,7 +96,7 @@ const Tela = () => {
 
   const handleNumero = (num) => {
     if (confirmado || !alunoSelecionado) return;
-    if (input.length < 2) setInput((prev) => prev + num);
+    if (input.length < 1) setInput(num);
   };
 
   const handleBranco = () => {
@@ -121,14 +118,27 @@ const Tela = () => {
 
   const handleConfirma = async () => {
     if (confirmado || !alunoSelecionado) return;
-    if (input.length >= 1 || branco) {
+    if (input.length === 1 || branco) {
       const numeroChapa = branco ? 0 : parseInt(input);
 
       try {
         await api.post(`/alunos/${alunoSelecionado.id}/votar`, { numeroChapa });
         audioConfirmacao.current.play();
+        setConfirmado(true);
+        setMensagem('Voto registrado com sucesso!');
+        
+        // Mostrar alerta
         alert('Voto registrado com sucesso!');
-        resetarEstado();
+        
+        // Resetar para próximo voto
+        setTimeout(() => {
+          resetarEstado();
+          setMensagem('');
+          // Voltar para tela inicial
+          setAnoSelecionado('');
+          setAlunoSelecionado(null);
+          setAlunos([]);
+        }, 2000);
       } catch (err) {
         console.error('Erro ao votar:', err);
         audioErro.current.play();
@@ -138,73 +148,106 @@ const Tela = () => {
   };
 
   const resetarEstado = () => {
-    setAnoSelecionado('');
-    setAlunoSelecionado(null);
     setInput('');
     setEquipe(null);
     setBranco(false);
     setNulo(false);
     setConfirmado(false);
-    setMensagem('');
+  };
+
+  const handleResultados = () => {
+    const senha = prompt('Digite a senha para acessar os resultados:');
+    if (senha === '456789') {
+      window.location.href = '/resultados';
+    } else {
+      audioErro.current.play();
+      setMensagem('Senha incorreta!');
+      setTimeout(() => setMensagem(''), 2000);
+    }
   };
 
   return (
     <div className="urna-container">
       <div className="urna-box">
-        <div className="urna-tela">
-          <h2 className="titulo">VOTAÇÃO GRÊMIO - 2025</h2>
-
-          {!confirmado && (
-            <div className="urna-selecao">
-              <select 
-                className="select" 
-                value={anoSelecionado} 
-                onChange={handleAnoChange}
-              >
-                <option value="">Selecione o Ano</option>
-                {anos.map((ano) => (
-                  <option key={ano} value={ano}>{ano}</option>
-                ))}
-              </select>
-
-              {anoSelecionado && (
+        <header className="urna-header">
+          <h1 className="urna-title">VOTAÇÃO GRÊMIO ESTUDANTIL 2025</h1>
+        </header>
+        
+        <div className="urna-content">
+          <div className="urna-panel left-panel">
+            <div className="selecao-container">
+              <div className="selecao-group">
+                <label className="selecao-label">ANO:</label>
                 <select 
-                  className="select" 
-                  value={alunoSelecionado?.id || ''} 
-                  onChange={handleAlunoChange}
+                  className="selecao-input" 
+                  value={anoSelecionado} 
+                  onChange={handleAnoChange}
+                  disabled={confirmado}
                 >
-                  <option value="">Selecione o Aluno</option>
-                  {alunos.map((a) => (
-                    <option key={a.id} value={a.id}>{a.nome}</option>
+                  <option value="">Selecione</option>
+                  {anos.map((ano) => (
+                    <option key={ano} value={ano}>{ano}º Ano</option>
                   ))}
                 </select>
+              </div>
+
+              {anoSelecionado && (
+                <div className="selecao-group">
+                  <label className="selecao-label">ALUNO:</label>
+                  <select 
+                    className="selecao-input" 
+                    value={alunoSelecionado?.id || ''} 
+                    onChange={handleAlunoChange}
+                    disabled={confirmado}
+                  >
+                    <option value="">Selecione</option>
+                    {alunos.map((a) => (
+                      <option key={a.id} value={a.id}>{a.nome}</option>
+                    ))}
+                  </select>
+                </div>
               )}
             </div>
-          )}
 
-          {alunoSelecionado && !confirmado && (
-            <>
-              <div className="numero-display">{input.padEnd(1, '_')}</div>
-
-              <div className="urna-corpo">
-                <div className="info-lado">
-                  <InfoEquipe equipe={equipe} branco={branco} nulo={nulo} />
-                </div>
-
-                <div className="teclado-lado">
-                  <Teclado
-                    onNumero={handleNumero}
-                    onBranco={handleBranco}
-                    onCorrige={handleCorrige}
-                    onConfirma={handleConfirma}
-                  />
-                </div>
+            <div className="numero-display-container">
+              <div className="numero-display-label">NÚMERO DIGITADO:</div>
+              <div className="numero-display">
+                {input.split('').map((num, i) => (
+                  <span key={i} className="numero-digit">{num}</span>
+                ))}
+                {Array(1 - input.length).fill(0).map((_, i) => (
+                  <span key={i} className="numero-placeholder">_</span>
+                ))}
               </div>
-            </>
-          )}
+            </div>
 
-          {mensagem && <div className="mensagem">{mensagem}</div>}
+            <div className="info-container">
+              <InfoEquipe equipe={equipe} branco={branco} nulo={nulo} />
+            </div>
+          </div>
+
+          <div className="urna-panel right-panel">
+            <Teclado
+              onNumero={handleNumero}
+              onBranco={handleBranco}
+              onCorrige={handleCorrige}
+              onConfirma={handleConfirma}
+              disabled={confirmado || !alunoSelecionado}
+            />
+          </div>
         </div>
+
+        <div className="urna-footer">
+          <button className="resultados-btn" onClick={handleResultados}>
+            VER RESULTADOS
+          </button>
+        </div>
+
+        {mensagem && (
+          <div className={`urna-message ${confirmado ? 'success' : ''}`}>
+            <div className="message-text">{mensagem}</div>
+          </div>
+        )}
       </div>
     </div>
   );
