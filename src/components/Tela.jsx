@@ -32,6 +32,7 @@ const Tela = () => {
         setAnos([...new Set(res.data.map((a) => a.ano))]);
       } catch (err) {
         console.error('Erro ao buscar anos:', err);
+        alert('Erro ao carregar dados dos alunos!');
       }
     };
 
@@ -41,6 +42,7 @@ const Tela = () => {
         setChapas(res.data);
       } catch (err) {
         console.error('Erro ao buscar chapas:', err);
+        alert('Erro ao carregar dados das chapas!');
       }
     };
 
@@ -62,6 +64,7 @@ const Tela = () => {
   useEffect(() => {
     if (nulo) {
       audioErro.current.play();
+      alert('Chapa não encontrada! Digite um número válido ou vote em branco.');
     }
   }, [nulo]);
 
@@ -79,6 +82,7 @@ const Tela = () => {
       setAlunos(res.data);
     } catch (err) {
       console.error('Erro ao buscar alunos:', err);
+      alert('Erro ao carregar alunos deste ano!');
     }
   };
 
@@ -86,17 +90,16 @@ const Tela = () => {
     const id = parseInt(e.target.value);
     const aluno = alunos.find((a) => a.id === id);
     if (aluno?.jaVotou) {
-      setMensagem('Este aluno já votou!');
+      alert('Este aluno já votou! Selecione outro aluno.');
       setAlunoSelecionado(null);
     } else {
-      setMensagem('');
       setAlunoSelecionado(aluno);
     }
   };
 
   const handleNumero = (num) => {
     if (confirmado || !alunoSelecionado) return;
-    if (input.length < 1) setInput(num);
+    setInput(num);
   };
 
   const handleBranco = () => {
@@ -113,37 +116,37 @@ const Tela = () => {
     setBranco(false);
     setNulo(false);
     setEquipe(null);
-    setMensagem('');
   };
 
   const handleConfirma = async () => {
     if (confirmado || !alunoSelecionado) return;
-    if (input.length === 1 || branco) {
-      const numeroChapa = branco ? 0 : parseInt(input);
+    
+    if (!input && !branco) {
+      alert('Por favor, digite um número ou vote em branco!');
+      return;
+    }
 
-      try {
-        await api.post(`/alunos/${alunoSelecionado.id}/votar`, { numeroChapa });
-        audioConfirmacao.current.play();
-        setConfirmado(true);
-        setMensagem('Voto registrado com sucesso!');
-        
-        // Mostrar alerta
-        alert('Voto registrado com sucesso!');
-        
-        // Resetar para próximo voto
-        setTimeout(() => {
-          resetarEstado();
-          setMensagem('');
-          // Voltar para tela inicial
-          setAnoSelecionado('');
-          setAlunoSelecionado(null);
-          setAlunos([]);
-        }, 2000);
-      } catch (err) {
-        console.error('Erro ao votar:', err);
-        audioErro.current.play();
-        setMensagem(err.response?.data?.erro || 'Erro ao registrar voto');
-      }
+    const numeroChapa = branco ? 0 : parseInt(input);
+
+    try {
+      await api.post(`/alunos/${alunoSelecionado.id}/votar`, { numeroChapa });
+      audioConfirmacao.current.play();
+      setConfirmado(true);
+      
+      alert('Voto registrado com sucesso!');
+      
+      // Resetar para próximo voto
+      setTimeout(() => {
+        resetarEstado();
+        // Voltar para tela inicial
+        setAnoSelecionado('');
+        setAlunoSelecionado(null);
+        setAlunos([]);
+      }, 1000);
+    } catch (err) {
+      console.error('Erro ao votar:', err);
+      audioErro.current.play();
+      alert(err.response?.data?.erro || 'Erro ao registrar voto!');
     }
   };
 
@@ -161,8 +164,7 @@ const Tela = () => {
       window.location.href = '/resultados';
     } else {
       audioErro.current.play();
-      setMensagem('Senha incorreta!');
-      setTimeout(() => setMensagem(''), 2000);
+      alert('Senha incorreta!');
     }
   };
 
@@ -212,12 +214,11 @@ const Tela = () => {
             <div className="numero-display-container">
               <div className="numero-display-label">NÚMERO DIGITADO:</div>
               <div className="numero-display">
-                {input.split('').map((num, i) => (
-                  <span key={i} className="numero-digit">{num}</span>
-                ))}
-                {Array(1 - input.length).fill(0).map((_, i) => (
-                  <span key={i} className="numero-placeholder">_</span>
-                ))}
+                {input ? (
+                  <span className="numero-digit">{input}</span>
+                ) : (
+                  <span className="numero-placeholder">_</span>
+                )}
               </div>
             </div>
 
@@ -242,12 +243,6 @@ const Tela = () => {
             VER RESULTADOS
           </button>
         </div>
-
-        {mensagem && (
-          <div className={`urna-message ${confirmado ? 'success' : ''}`}>
-            <div className="message-text">{mensagem}</div>
-          </div>
-        )}
       </div>
     </div>
   );
