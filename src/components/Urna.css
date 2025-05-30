@@ -1,117 +1,96 @@
-/* Estilos base responsivos */
+/* Container principal - Mobile First */
 .urna-container {
-  height: 100vh;
   width: 100vw;
+  height: 100vh;
   background-color: #222;
   display: flex;
   justify-content: center;
-  align-items: center;
-
+  align-items: flex-start; /* Alterado para flex-start */
+  padding: 10px;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
+/* Estrutura da urna */
 .urna-box {
+  width: 100%;
+  height: auto;
+  min-height: 90vh; /* Altura mínima */
+  max-height: 95vh; /* Altura máxima */
   background-color: #d9d9d9;
   border: 8px solid #333;
   border-radius: 15px;
-  width: 100%;
-  max-width: 900px;
-  height: 100%;
   display: flex;
   flex-direction: column;
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  overflow: hidden; /* Garante que nada vaze */
 }
 
+/* Tela interna */
 .urna-tela {
-  height: 100%;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
+  flex: 1;
+  margin: 10px;
+  padding: 15px;
   background-color: #e6e6e6;
-  margin: 3px;
+  border: 3px solid #666;
   border-radius: 8px;
-  border: 2px solid #999;
-}
-
-.titulo {
-  text-align: center;
-  font-size: 1.8rem;
-  margin-bottom: 10px;
-  color: #333;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.urna-selecao {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 10px;
+  overflow: hidden; /* Scroll interno se necessário */
 }
 
-.select {
-  padding: 12px;
-  font-size: 1rem;
-  border-radius: 6px;
-  border: 2px solid #666;
-  background-color: #fff;
-}
-
-.numero-display {
-  font-size: 2rem;
-  letter-spacing: 8px;
-  text-align: center;
-  margin: 20px 0;
-  background-color: #333;
-  color: #fff;
-  padding: 5px;
-  border-radius: 6px;
-  font-family: monospace;
-}
-
+/* Conteúdo principal - Mobile */
 .urna-corpo {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
-  gap: 20px;
-}
-
-.info-lado, .teclado-lado {
   flex: 1;
+  min-height: 0; /* Permite compressão */
+  gap: 15px;
 }
 
-.mensagem {
-  margin-top: 16px;
-  color: #d9534f;
-  text-align: center;
-  font-weight: bold;
-  font-size: 1.1rem;
+/* Ajustes específicos para mobile */
+@media (max-width: 767px) {
+  .urna-container {
+    padding: 5px;
+    align-items: center;
+  }
+  
+  .urna-box {
+    min-height: 95vh;
+    max-height: 95vh;
+  }
+  
+  .urna-tela {
+    margin: 5px;
+    padding: 10px;
+  }
+  
+  .titulo {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+  }
+  
+  .numero-display {
+    font-size: 1.8rem;
+    margin: 10px 0;
+    padding: 8px;
+  }
+  
+  .select {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
 }
 
-/* Media Queries para responsividade */
+/* Desktop */
 @media (min-width: 768px) {
-  .urna-selecao {
-    flex-direction: row;
-    justify-content: center;
+  .urna-box {
+    max-width: 900px;
+    height: 600px;
+    min-height: auto;
   }
   
   .urna-corpo {
     flex-direction: row;
-  }
-  
-  .select {
-    min-width: 200px;
-  }
-}
-
-@media (max-width: 480px) {
-  .titulo {
-    font-size: 1.4rem;
-  }
-  
-  .numero-display {
-    font-size: 2rem;
-    letter-spacing: 4px;
   }
 }
