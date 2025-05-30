@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import InfoEquipe from './InfoEquipe';
 import Teclado from './Teclado';
 import api from '../services/api';
+import { useNavigate } from 'react-router-dom';
 import './Urna.css';
 
 const Tela = () => {
@@ -15,82 +16,97 @@ const Tela = () => {
   const [branco, setBranco] = useState(false);
   const [nulo, setNulo] = useState(false);
   const [confirmado, setConfirmado] = useState(false);
-  const [mensagem, setMensagem] = useState('');
+  const navigate = useNavigate();
 
+  // Referências para os áudios
   const audioConfirmacao = useRef(new Audio('/audio/confirma-urna.mp3'));
   const audioErro = useRef(new Audio('/audio/erro.mp3'));
 
+  // Configurar áudios quando o componente montar
   useEffect(() => {
+    // Configurações iniciais dos áudios
     audioConfirmacao.current.volume = 1;
     audioErro.current.volume = 1;
+    audioConfirmacao.current.load();
+    audioErro.current.load();
+
+    return () => {
+      // Limpeza quando o componente desmontar
+      audioConfirmacao.current.pause();
+      audioErro.current.pause();
+    };
   }, []);
 
   useEffect(() => {
-    const fetchAlunos = async () => {
+    const fetchData = async () => {
       try {
-        const res = await api.get('/alunos');
-        setAnos([...new Set(res.data.map((a) => a.ano))]);
+        const [alunosRes, chapasRes] = await Promise.all([
+          api.get('/alunos'),
+          api.get('/chapas')
+        ]);
+        
+        setAnos([...new Set(alunosRes.data.map(a => a.ano))]);
+        setChapas(chapasRes.data);
       } catch (err) {
-        console.error('Erro ao buscar anos:', err);
-        alert('Erro ao carregar dados dos alunos!');
+        console.error('Erro ao buscar dados:', err);
+        playErrorSound();
+        alert('Erro ao carregar dados da votação!');
       }
     };
 
-    const fetchChapas = async () => {
-      try {
-        const res = await api.get('/chapas');
-        setChapas(res.data);
-      } catch (err) {
-        console.error('Erro ao buscar chapas:', err);
-        alert('Erro ao carregar dados das chapas!');
-      }
-    };
-
-    fetchAlunos();
-    fetchChapas();
+    fetchData();
   }, []);
+
+  const playConfirmationSound = async () => {
+    try {
+      audioConfirmacao.current.currentTime = 0;
+      await audioConfirmacao.current.play();
+    } catch (err) {
+      console.error('Erro ao tocar áudio de confirmação:', err);
+    }
+  };
+
+  const playErrorSound = async () => {
+    try {
+      audioErro.current.currentTime = 0;
+      await audioErro.current.play();
+    } catch (err) {
+      console.error('Erro ao tocar áudio de erro:', err);
+    }
+  };
 
   useEffect(() => {
     if (input.length === 1) {
-      const encontrada = chapas.find((c) => String(c.numero) === input);
-      setEquipe(encontrada || null);
-      setNulo(!encontrada);
+      const chapaEncontrada = chapas.find(c => c.numero.toString() === input);
+      setEquipe(chapaEncontrada || null);
+      setNulo(!chapaEncontrada);
     } else {
       setEquipe(null);
       setNulo(false);
     }
   }, [input, chapas]);
 
-  useEffect(() => {
-    if (nulo) {
-      audioErro.current.play();
-      alert('Chapa não encontrada! Digite um número válido ou vote em branco.');
-    }
-  }, [nulo]);
-
   const handleAnoChange = async (e) => {
     const ano = e.target.value;
     setAnoSelecionado(ano);
     setAlunoSelecionado(null);
-    setInput('');
-    setBranco(false);
-    setNulo(false);
-    setEquipe(null);
-    setMensagem('');
+    resetarEstado();
+    
     try {
       const res = await api.get(`/alunos/ano/${ano}`);
       setAlunos(res.data);
     } catch (err) {
       console.error('Erro ao buscar alunos:', err);
+      playErrorSound();
       alert('Erro ao carregar alunos deste ano!');
     }
   };
 
   const handleAlunoChange = (e) => {
-    const id = parseInt(e.target.value);
-    const aluno = alunos.find((a) => a.id === id);
+    const aluno = alunos.find(a => a.id === parseInt(e.target.value));
     if (aluno?.jaVotou) {
-      alert('Este aluno já votou! Selecione outro aluno.');
+      playErrorSound();
+      alert('Este aluno já votou! Selecione outro.');
       setAlunoSelecionado(null);
     } else {
       setAlunoSelecionado(aluno);
@@ -104,48 +120,41 @@ const Tela = () => {
 
   const handleBranco = () => {
     if (confirmado || !alunoSelecionado) return;
-    setInput('');
+    resetarEstado();
     setBranco(true);
-    setNulo(false);
-    setEquipe(null);
   };
 
   const handleCorrige = () => {
     if (confirmado) return;
-    setInput('');
-    setBranco(false);
-    setNulo(false);
-    setEquipe(null);
+    resetarEstado();
   };
 
   const handleConfirma = async () => {
     if (confirmado || !alunoSelecionado) return;
     
     if (!input && !branco) {
-      alert('Por favor, digite um número ou vote em branco!');
+      playErrorSound();
+      alert('Digite um número ou vote em branco!');
       return;
     }
 
-    const numeroChapa = branco ? 0 : parseInt(input);
-
     try {
-      await api.post(`/alunos/${alunoSelecionado.id}/votar`, { numeroChapa });
-      audioConfirmacao.current.play();
-      setConfirmado(true);
+      await api.post(`/alunos/${alunoSelecionado.id}/votar`, {
+        numeroChapa: branco ? 0 : parseInt(input)
+      });
       
+      await playConfirmationSound();
+      setConfirmado(true);
       alert('Voto registrado com sucesso!');
       
-      // Resetar para próximo voto
+      // Resetar após 2 segundos
       setTimeout(() => {
-        resetarEstado();
-        // Voltar para tela inicial
-        setAnoSelecionado('');
-        setAlunoSelecionado(null);
-        setAlunos([]);
-      }, 1000);
+        resetarEstadoCompleto();
+      }, 2000);
+      
     } catch (err) {
       console.error('Erro ao votar:', err);
-      audioErro.current.play();
+      playErrorSound();
       alert(err.response?.data?.erro || 'Erro ao registrar voto!');
     }
   };
@@ -155,15 +164,21 @@ const Tela = () => {
     setEquipe(null);
     setBranco(false);
     setNulo(false);
+  };
+
+  const resetarEstadoCompleto = () => {
+    resetarEstado();
     setConfirmado(false);
+    setAlunoSelecionado(null);
+    setAnoSelecionado('');
   };
 
   const handleResultados = () => {
     const senha = prompt('Digite a senha para acessar os resultados:');
     if (senha === '456789') {
-      window.location.href = '/resultados';
+      navigate('/resultados');
     } else {
-      audioErro.current.play();
+      playErrorSound();
       alert('Senha incorreta!');
     }
   };
@@ -172,22 +187,21 @@ const Tela = () => {
     <div className="urna-container">
       <div className="urna-box">
         <header className="urna-header">
-          <h1 className="urna-title">VOTAÇÃO GRÊMIO ESTUDANTIL 2025</h1>
+          <h1>VOTAÇÃO GRÊMIO ESTUDANTIL 2025</h1>
         </header>
         
         <div className="urna-content">
           <div className="urna-panel left-panel">
             <div className="selecao-container">
               <div className="selecao-group">
-                <label className="selecao-label">ANO:</label>
+                <label>ANO:</label>
                 <select 
-                  className="selecao-input" 
                   value={anoSelecionado} 
                   onChange={handleAnoChange}
                   disabled={confirmado}
                 >
                   <option value="">Selecione</option>
-                  {anos.map((ano) => (
+                  {anos.map(ano => (
                     <option key={ano} value={ano}>{ano}º Ano</option>
                   ))}
                 </select>
@@ -195,15 +209,14 @@ const Tela = () => {
 
               {anoSelecionado && (
                 <div className="selecao-group">
-                  <label className="selecao-label">ALUNO:</label>
+                  <label>ALUNO:</label>
                   <select 
-                    className="selecao-input" 
                     value={alunoSelecionado?.id || ''} 
                     onChange={handleAlunoChange}
                     disabled={confirmado}
                   >
                     <option value="">Selecione</option>
-                    {alunos.map((a) => (
+                    {alunos.map(a => (
                       <option key={a.id} value={a.id}>{a.nome}</option>
                     ))}
                   </select>
@@ -212,13 +225,9 @@ const Tela = () => {
             </div>
 
             <div className="numero-display-container">
-              <div className="numero-display-label">NÚMERO DIGITADO:</div>
+              <div>NÚMERO DIGITADO:</div>
               <div className="numero-display">
-                {input ? (
-                  <span className="numero-digit">{input}</span>
-                ) : (
-                  <span className="numero-placeholder">_</span>
-                )}
+                {input || <span className="numero-placeholder">_</span>}
               </div>
             </div>
 
