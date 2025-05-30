@@ -173,15 +173,20 @@ const Tela = () => {
     setAnoSelecionado('');
   };
 
-  const handleResultados = () => {
-    const senha = prompt('Digite a senha para acessar os resultados:');
-    if (senha === '456789') {
-      navigate('/resultados');
+ const handleResultados = () => {
+  const senha = prompt('Digite a senha para acessar os resultados:');
+  if (senha === '456789') {
+    // Verifica se está no Render
+    if (window.location.host.includes('render.com')) {
+      window.location.href = window.location.origin + '/resultados';
     } else {
-      playErrorSound();
-      alert('Senha incorreta!');
+      navigate('/resultados');
     }
-  };
+  } else {
+    playErrorSound();
+    alert('Senha incorreta!');
+  }
+};
 
   return (
     <div className="urna-container">
@@ -202,7 +207,7 @@ const Tela = () => {
                 >
                   <option value="">Selecione</option>
                   {anos.map(ano => (
-                    <option key={ano} value={ano}>{ano}º Ano</option>
+                    <option key={ano} value={ano}>{ano}</option>
                   ))}
                 </select>
               </div>
