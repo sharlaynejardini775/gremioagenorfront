@@ -1,0 +1,268 @@
+/* Estilos Gerais */
+.resultados-container {
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Cabeçalho */
+.resultados-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card-header-primary {
+  background-color: #3498db;
+  color: white;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header-primary h2 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+/* Botões */
+.btn-refresh, .btn-home {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-refresh {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+.btn-refresh:hover {
+  background-color: #e2e6ea;
+}
+
+.btn-home {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+.btn-home:hover {
+  background-color: #e2e6ea;
+}
+
+/* Alertas */
+.alert-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.btn-try-again {
+  background-color: transparent;
+  border: 1px solid #721c24;
+  color: #721c24;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Controles */
+.results-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1.5rem;
+
+}
+
+.results-controls h5 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #495057;
+}
+
+.tab-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tab-btn {
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  border: 1px solid #dee2e6;
+  color: #495057;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s;
+}
+
+.tab-btn.active {
+  background-color: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 0.25rem solid rgba(52, 152, 219, 0.3);
+  border-top-color: #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  margin-top: 1rem;
+  color: #6c757d;
+}
+
+/* Gráficos */
+.charts-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.chart-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.chart-header {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.chart-header h5 {
+  margin: 0;
+  color: #495057;
+}
+
+.chart-wrapper {
+  height: 400px;
+  padding: 1rem;
+}
+
+/* Tabela */
+.table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.table-header h5 {
+  margin: 0;
+  color: #495057;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.results-table thead {
+  background-color: #3498db;
+  color: white;
+}
+
+.results-table th, .results-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.results-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.color-badge {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  margin-right: 0.5rem;
+}
+
+.progress-bar-container {
+  width: 100%;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+/* Sem resultados */
+.no-results {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .results-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .charts-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-header-primary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
